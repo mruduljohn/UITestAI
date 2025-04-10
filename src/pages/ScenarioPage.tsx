@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Title, Anchor, Group, Button } from '@mantine/core';
-import { IconChevronLeft, IconLink } from '@tabler/icons-react';
+import { Title, Anchor, Group, Button, Badge, Select } from '@mantine/core';
+import { IconChevronLeft, IconLink, IconArrowRight } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 import { ScenarioStats } from '../components/ScenarioStats';
 import { ScenarioFilters } from '../components/ScenarioFilters';
 import { ScenarioTags } from '../components/ScenarioTags';
@@ -8,16 +9,18 @@ import { ScenarioCard } from '../components/ScenarioCard';
 import { FilterOption, GroupByOption, Scenario, ScenarioGroup } from '../types';
 
 export function ScenarioPage() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterOption>('All');
   const [groupBy, setGroupBy] = useState<GroupByOption>('None');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState<string | undefined>(undefined);
+  const [selectedScenario, setSelectedScenario] = useState('Search for a product and add to cart');
 
   // Mock data
   const stats: ScenarioGroup[] = [
-    { title: 'Scenarios', count: 10, variant: 'default' },
-    { title: 'Passed scenarios', count: 9, variant: 'success' },
-    { title: 'Failed scenarios', count: 1, variant: 'error' },
+    { title: 'Steps', count: 10, variant: 'default' },
+    { title: 'Passed steps', count: 9, variant: 'success' },
+    { title: 'Failed steps', count: 1, variant: 'error' },
   ];
 
   const tags = ['regression', 'login', 'user management'];
@@ -74,6 +77,7 @@ export function ScenarioPage() {
           variant="subtle" 
           leftSection={<IconChevronLeft size={16} stroke={1.5} />}
           className="mr-2 text-gray-500 p-0"
+          onClick={() => navigate('/dashboard')}
           styles={{
             root: {
               backgroundColor: 'transparent',
@@ -100,22 +104,37 @@ export function ScenarioPage() {
             </Anchor>
           </div>
           <Group justify="space-between" className="flex-wrap">
-            <Title order={1} size="h3" fw={600} className="text-gray-900">
-              Search for a product and add to cart
-            </Title>
-            <Button
-              variant="subtle"
-              leftSection={<IconLink size={16} stroke={1.5} />}
-              className="text-gray-500 p-0"
-              styles={{
-                root: {
-                  backgroundColor: 'transparent',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0,0,0,0.05)'
-                  }
-                }
-              }}
-            />
+            <div className="flex flex-col">
+              <Title order={1} size="h3" fw={600} className="text-gray-900 mb-1">
+                {selectedScenario}
+              </Title>
+              <div className="flex items-center">
+                <Badge color="blue" size="sm" radius="sm" className="mr-2">E-commerce Site</Badge>
+                <Badge color="gray" size="sm" radius="sm">Chrome</Badge>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <Select
+                label="Other scenarios for this site"
+                placeholder="Select scenario"
+                data={[
+                  'Search for a product and add to cart',
+                  'User login flow',
+                  'Checkout process',
+                  'Account creation'
+                ]}
+                value={selectedScenario}
+                onChange={(val) => val && setSelectedScenario(val)}
+                className="w-64 mr-2"
+              />
+              <Button
+                variant="subtle"
+                rightSection={<IconArrowRight size={16} stroke={1.5} />}
+                className="text-blue-500 self-end mb-0.5"
+              >
+                View
+              </Button>
+            </div>
           </Group>
         </div>
       </div>
@@ -128,6 +147,51 @@ export function ScenarioPage() {
 
       <ScenarioStats stats={stats} />
 
+      <div className="my-6">
+        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+          <Title order={3} size="h6" className="mb-3 text-gray-700 font-semibold">
+            Scenario Steps
+          </Title>
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex items-start">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 ${
+                  index === 3 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
+                }`}>
+                  {index === 3 ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-gray-800 mb-1">
+                    {index === 0 && 'Navigate to homepage'}
+                    {index === 1 && 'Click on search bar'}
+                    {index === 2 && 'Type "smartphone" in search field'}
+                    {index === 3 && 'Click on product card'}
+                    {index === 4 && 'Click "Add to Cart" button'}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {index === 3 ? 'Failed: Could not find product card element' : 'Completed successfully'}
+                  </p>
+                </div>
+                {index === 3 && (
+                  <Button size="xs" variant="outline" color="red" className="ml-2">
+                    View Details
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <ScenarioFilters 
         filterValue={filter}
         groupByValue={groupBy}
@@ -138,7 +202,7 @@ export function ScenarioPage() {
 
       <div className="mt-6">
         <Title order={3} size="h6" className="mb-4 text-gray-700 font-semibold">
-          Scenarios
+          Related Scenarios
         </Title>
         
         <div className="rounded-lg overflow-hidden bg-white border border-gray-200 shadow-sm">
@@ -156,7 +220,10 @@ export function ScenarioPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredScenarios.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} />
+                <ScenarioCard 
+                  key={scenario.id} 
+                  scenario={scenario} 
+                />
               ))}
             </tbody>
           </table>

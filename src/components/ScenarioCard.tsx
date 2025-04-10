@@ -3,9 +3,10 @@ import { Scenario } from '../types';
 
 interface ScenarioCardProps {
   scenario: Scenario;
+  onClick?: () => void;
 }
 
-export function ScenarioCard({ scenario }: ScenarioCardProps) {
+export function ScenarioCard({ scenario, onClick }: ScenarioCardProps) {
   const getBrowserIcon = (browser: string) => {
     switch (browser) {
       case 'Chrome':
@@ -53,7 +54,10 @@ export function ScenarioCard({ scenario }: ScenarioCardProps) {
   };
 
   return (
-    <tr>
+    <tr 
+      className={onClick ? "hover:bg-gray-50 cursor-pointer" : ""}
+      onClick={onClick}
+    >
       <td className="px-4 py-2.5">
         <div className="flex items-center">
           <div className="w-5 h-5 mr-2 flex-shrink-0">

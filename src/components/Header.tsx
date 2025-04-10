@@ -23,26 +23,6 @@ export function Header() {
           </div>
         </div>
         
-        <Button
-          variant="light"
-          color="red"
-          leftSection={<span className="bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[10px] font-bold">REC</span>}
-          className="ml-2 text-sm font-medium"
-          styles={{
-            root: {
-              color: '#fa5252',
-              backgroundColor: '#fff0f0',
-              borderRadius: '4px',
-              padding: '6px 12px',
-              height: '32px',
-              border: 'none',
-              boxShadow: 'none',
-            }
-          }}
-        >
-          Record scenario
-        </Button>
-        
         <Menu>
           <Menu.Target>
             <Button

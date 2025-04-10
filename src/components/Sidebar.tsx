@@ -1,24 +1,28 @@
 import { NavLink, Button } from '@mantine/core';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   IconHome as IconDashboard, 
-  IconCheckbox,
-  IconList,
   IconReportAnalytics,
-  IconBrain,
-  IconFlask as IconTestPipe,
-  IconSettings,
   IconArrowBarLeft
 } from '@tabler/icons-react';
 
 export function Sidebar() {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
   const navItems = [
-    { icon: IconDashboard, label: 'Dashboard', href: '#' },
-    { icon: IconCheckbox, label: 'Features', href: '#' },
-    { icon: IconList, label: 'Executions', href: '#' },
-    { icon: IconReportAnalytics, label: 'Reports', href: '#', active: true },
-    { icon: IconBrain, label: 'AI Oversight', href: '#' },
-    { icon: IconTestPipe, label: 'Test Data', href: '#' },
-    { icon: IconSettings, label: 'Settings', href: '#' },
+    { 
+      icon: IconDashboard, 
+      label: 'Dashboard', 
+      href: '/dashboard', 
+      active: currentPath === '/dashboard'
+    },
+    { 
+      icon: IconReportAnalytics, 
+      label: 'Reports', 
+      href: '/reports', 
+      active: currentPath === '/reports'
+    },
   ];
 
   return (
@@ -35,23 +39,28 @@ export function Sidebar() {
               <path d="M9.5 14.25l-5.584 2.936 1.066-6.218L.465 6.564l6.243-.907L9.5 0l2.792 5.657 6.243.907-4.517 4.404 1.066 6.218" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold ml-2">BlinQAlt</h1>
+          <h1 className="text-xl font-semibold ml-2">UITESTAI</h1>
         </div>
       </div>
       
       <nav className="flex-1 py-2">
         {navItems.map((item, index) => (
-          <NavLink
-            key={index}
-            leftSection={<item.icon size={18} stroke={1.5} />}
-            label={item.label}
-            active={item.active}
-            className={`mx-3 mb-1 rounded-md ${
-              item.active 
-                ? 'bg-blue-50 text-blue-600 font-medium' 
-                : 'text-gray-700 font-medium'
-            }`}
-          />
+          <Link 
+            key={index} 
+            to={item.href}
+            style={{ textDecoration: 'none' }}
+          >
+            <NavLink
+              leftSection={<item.icon size={18} stroke={1.5} />}
+              label={item.label}
+              active={item.active}
+              className={`mx-3 mb-1 rounded-md ${
+                item.active 
+                  ? 'bg-blue-50 text-blue-600 font-medium' 
+                  : 'text-gray-700 font-medium'
+              }`}
+            />
+          </Link>
         ))}
       </nav>
 
