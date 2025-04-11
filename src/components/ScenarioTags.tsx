@@ -1,4 +1,4 @@
-import { Badge } from '@mantine/core';
+import { Badge, Group, Text } from '@mantine/core';
 
 interface ScenarioTagsProps {
   tags: string[];
@@ -8,23 +8,28 @@ interface ScenarioTagsProps {
 
 export function ScenarioTags({ tags, activeTag, onTagSelect }: ScenarioTagsProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <Group gap="sm" wrap="wrap">
       {tags.map((tag) => (
         <Badge
           key={tag}
-          variant={activeTag === tag ? 'filled' : 'light'}
-          color={activeTag === tag ? 'gray' : 'gray'}
-          onClick={() => onTagSelect(tag)}
-          className={`cursor-pointer font-normal rounded-full px-3 text-sm lowercase ${
-            activeTag === tag 
-              ? 'bg-gray-800 text-white' 
-              : 'bg-[#f3f4f6] text-gray-800 hover:bg-gray-200'
-          }`}
-          size="md"
+          onClick={() => onTagSelect(activeTag === tag ? undefined : tag)}
+          radius="sm"
+          classNames={{
+            root: `cursor-pointer font-normal transition-all duration-200 ${
+              activeTag === tag 
+                ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`
+          }}
         >
           {tag}
         </Badge>
       ))}
-    </div>
+      {tags.length === 0 && (
+        <Text size="sm" color="dimmed" className="italic">
+          No tags available
+        </Text>
+      )}
+    </Group>
   );
 } 

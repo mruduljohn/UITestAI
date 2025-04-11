@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import { Title, Anchor, Group, Button, Badge, Select } from '@mantine/core';
-import { IconChevronLeft, IconLink, IconArrowRight } from '@tabler/icons-react';
+import { Title, Anchor, Group, Button, Badge, Select, Paper, Timeline, Text, Divider, Card } from '@mantine/core';
+import { 
+  IconChevronLeft, 
+  IconArrowRight, 
+  IconCheck, 
+  IconX, 
+  IconExclamationCircle,
+  IconPhoto,
+  IconEye
+} from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { ScenarioStats } from '../components/ScenarioStats';
 import { ScenarioFilters } from '../components/ScenarioFilters';
@@ -15,6 +23,7 @@ export function ScenarioPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState<string | undefined>(undefined);
   const [selectedScenario, setSelectedScenario] = useState('Search for a product and add to cart');
+  const [selectedStep, setSelectedStep] = useState<number | null>(3);
 
   // Mock data
   const stats: ScenarioGroup[] = [
@@ -70,6 +79,14 @@ export function ScenarioPage() {
     return true;
   });
 
+  const steps = [
+    { id: 0, title: 'Navigate to homepage', status: 'success' },
+    { id: 1, title: 'Click on search bar', status: 'success' },
+    { id: 2, title: 'Type "smartphone" in search field', status: 'success' },
+    { id: 3, title: 'Click on product card', status: 'error', details: 'Could not find product card element' },
+    { id: 4, title: 'Click "Add to Cart" button', status: 'success' },
+  ];
+
   return (
     <div className="p-6">
       <div className="flex items-center mb-5">
@@ -98,12 +115,8 @@ export function ScenarioPage() {
             <Anchor href="#" size="xs" className="text-gray-600 no-underline hover:underline font-medium">
               Mark Adams
             </Anchor>
-            <span className="text-xs mx-1">•</span>
-            <Anchor href="#" size="xs" className="text-gray-600 no-underline hover:underline font-medium">
-              Dev
-            </Anchor>
           </div>
-          <Group justify="space-between" className="flex-wrap">
+          <Group justify="space-between" className="flex-wrap items-start">
             <div className="flex flex-col">
               <Title order={1} size="h3" fw={600} className="text-gray-900 mb-1">
                 {selectedScenario}
@@ -139,75 +152,115 @@ export function ScenarioPage() {
         </div>
       </div>
 
-      <ScenarioTags 
-        tags={tags}
-        activeTag={activeTag}
-        onTagSelect={setActiveTag}
-      />
+      <div className="mb-6">
+        <ScenarioStats stats={stats} />
+      </div>
 
-      <ScenarioStats stats={stats} />
-
-      <div className="my-6">
-        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <Title order={3} size="h6" className="mb-3 text-gray-700 font-semibold">
-            Scenario Steps
-          </Title>
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="flex items-start">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 ${
-                  index === 3 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
-                }`}>
-                  {index === 3 ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-1">
+          <Paper shadow="sm" radius="md" p="md" className="h-full">
+            <Title order={3} size="h6" className="mb-3 text-gray-700 font-semibold">
+              Scenario Steps
+            </Title>
+            <Timeline active={3} bulletSize={24} lineWidth={2}>
+              {steps.map((step) => (
+                <Timeline.Item
+                  key={step.id}
+                  bullet={step.status === 'success' ? <IconCheck size={12} /> : <IconX size={12} />}
+                  title={
+                    <Text 
+                      size="sm" 
+                      className={`font-medium ${step.status === 'error' ? 'text-red-600' : 'text-gray-800'}`}
+                    >
+                      {step.title}
+                    </Text>
+                  }
+                  lineVariant={step.status === 'error' ? 'dashed' : 'solid'}
+                  color={step.status === 'error' ? 'red' : 'green'}
+                  className={selectedStep === step.id ? 'bg-blue-50 rounded-md py-1 px-2 -mx-2' : ''}
+                  onClick={() => setSelectedStep(step.id)}
+                >
+                  <Text size="xs" color="dimmed">
+                    {step.status === 'error' 
+                      ? `Failed: ${step.details}` 
+                      : 'Completed successfully'}
+                  </Text>
+                </Timeline.Item>
+              ))}
+            </Timeline>
+          </Paper>
+        </div>
+        
+        <div className="lg:col-span-2">
+          <Paper shadow="sm" radius="md" p="md" className="h-full">
+            {selectedStep === 3 ? (
+              <>
+                <div className="flex items-center justify-between mb-3">
+                  <Title order={3} size="h6" className="text-gray-700 font-semibold flex items-center">
+                    Error Details
+                    <Badge color="red" className="ml-2">Failed</Badge>
+                  </Title>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-gray-800 mb-1">
-                    {index === 0 && 'Navigate to homepage'}
-                    {index === 1 && 'Click on search bar'}
-                    {index === 2 && 'Type "smartphone" in search field'}
-                    {index === 3 && 'Click on product card'}
-                    {index === 4 && 'Click "Add to Cart" button'}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {index === 3 ? 'Failed: Could not find product card element' : 'Completed successfully'}
-                  </p>
+                
+                <Card withBorder className="mb-3 border-red-200 bg-red-50">
+                  <Group>
+                    <IconExclamationCircle className="text-red-500" size={20} />
+                    <div>
+                      <Text fw={500}>Error: Element not found</Text>
+                      <Text size="sm" color="dimmed">
+                        Could not find product card element with selector: .product-card
+                      </Text>
+                    </div>
+                  </Group>
+                </Card>
+                
+                <div className="mb-4">
+                  <Text fw={500} size="sm" className="mb-2">Expected Result:</Text>
+                  <Text size="sm" className="text-gray-700">
+                    The product card should be visible and clickable after search results are loaded.
+                  </Text>
                 </div>
-                {index === 3 && (
-                  <Button size="xs" variant="outline" color="red" className="ml-2">
-                    View Details
+                
+                <div className="mb-4">
+                  <Text fw={500} size="sm" className="mb-2">Actual Result:</Text>
+                  <Text size="sm" className="text-gray-700">
+                    The product card element could not be found in the DOM. The search results may not have finished loading or the element structure has changed.
+                  </Text>
+                </div>
+                
+                <Divider my="sm" />
+                
+                <div className="flex justify-end">
+                  <Button variant="subtle" leftSection={<IconEye size={16} />} className="mr-2">
+                    View Screenshot
                   </Button>
-                )}
+                  <Button color="blue">
+                    Generate Fix
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full py-10">
+                <IconExclamationCircle size={48} className="text-gray-300 mb-4" />
+                <Text fw={500} className="text-gray-500">
+                  Select a step to view details
+                </Text>
               </div>
-            ))}
-          </div>
+            )}
+          </Paper>
         </div>
       </div>
 
-      <ScenarioFilters 
-        filterValue={filter}
-        groupByValue={groupBy}
-        onFilterChange={setFilter}
-        onGroupByChange={setGroupBy}
-        onSearchChange={setSearchQuery}
-      />
-
-      <div className="mt-6">
-        <Title order={3} size="h6" className="mb-4 text-gray-700 font-semibold">
-          Related Scenarios
-        </Title>
+      <Paper shadow="sm" radius="md" className="overflow-hidden mb-6">
+        <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <Title order={3} size="h6" className="text-gray-700 font-semibold">
+            Related Scenarios
+          </Title>
+        </div>
         
-        <div className="rounded-lg overflow-hidden bg-white border border-gray-200 shadow-sm">
+        <div className="rounded-lg overflow-auto" style={{ maxHeight: '300px' }}>
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-gray-600">
+            <thead className="bg-gray-50 text-left text-gray-600 sticky top-0 z-10">
               <tr>
                 <th className="px-4 py-2.5 font-medium">Scenario info</th>
                 <th className="px-4 py-2.5 font-medium">Browser</th>
@@ -215,7 +268,6 @@ export function ScenarioPage() {
                 <th className="px-4 py-2.5 font-medium">Comment</th>
                 <th className="px-4 py-2.5 font-medium">Status</th>
                 <th className="px-4 py-2.5 font-medium">Error message</th>
-                <th className="px-4 py-2.5 font-medium">Root</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -225,10 +277,17 @@ export function ScenarioPage() {
                   scenario={scenario} 
                 />
               ))}
+              {filteredScenarios.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-gray-500">
+                    No scenarios found matching your criteria
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-      </div>
+      </Paper>
     </div>
   );
 } 

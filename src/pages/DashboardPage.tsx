@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Title, Group, Button, Modal, TextInput, Textarea, Select } from '@mantine/core';
+import { Title, Group, Button, Modal, TextInput, Textarea, Select, Paper, Divider, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus, IconBrandChrome, IconBrandSafari } from '@tabler/icons-react';
+import { IconPlus, IconBrandChrome, IconBrandSafari, IconSearch } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { ScenarioStats } from '../components/ScenarioStats';
 import { ScenarioFilters } from '../components/ScenarioFilters';
@@ -98,60 +98,82 @@ export function DashboardPage() {
         </Title>
         <Button
           leftSection={<IconPlus size={16} stroke={1.5} />}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-blue-600 hover:bg-blue-700 shadow-sm"
           onClick={open}
         >
           Create Scenario from Prompt
         </Button>
       </div>
 
-      <div className="mb-6">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="flex-1">
+      <Paper shadow="xs" radius="md" p="md" className="mb-6">
+        <div className="flex items-center">
+          <div className="w-64 mr-4">
             <Select
               label="Project"
               placeholder="Select project"
               data={['Main-project', 'E-commerce Site', 'Banking Portal']}
               value={selectedProject}
               onChange={(val) => val && setSelectedProject(val)}
+              searchable
+              clearable={false}
             />
           </div>
-          <div className="flex items-end">
-            <Button 
-              variant="outline" 
-              className="mb-0.5"
-              onClick={() => setIsCreatingProject(true)}
-            >
-              Create Project
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            className="self-end mb-1"
+            onClick={() => setIsCreatingProject(true)}
+          >
+            Create Project
+          </Button>
         </div>
+      </Paper>
+
+      <div className="mb-6">
+        <div className="grid grid-cols-1 gap-6 mb-4">
+          <ScenarioStats stats={stats} />
+        </div>
+        
+        <div className="mb-4">
+          <Text fw={500} size="sm" className="mb-2">Tags</Text>
+          <ScenarioTags 
+            tags={tags}
+            activeTag={activeTag}
+            onTagSelect={setActiveTag}
+          />
+        </div>
+
+        <Paper shadow="xs" radius="md" p="md">
+          <ScenarioFilters 
+            filterValue={filter}
+            groupByValue={groupBy}
+            onFilterChange={setFilter}
+            onGroupByChange={setGroupBy}
+            onSearchChange={setSearchQuery}
+          />
+        </Paper>
       </div>
 
-      <ScenarioTags 
-        tags={tags}
-        activeTag={activeTag}
-        onTagSelect={setActiveTag}
-      />
-
-      <ScenarioStats stats={stats} />
-
-      <ScenarioFilters 
-        filterValue={filter}
-        groupByValue={groupBy}
-        onFilterChange={setFilter}
-        onGroupByChange={setGroupBy}
-        onSearchChange={setSearchQuery}
-      />
-
-      <div className="mt-6">
-        <Title order={3} size="h6" className="mb-4 text-gray-700 font-semibold">
-          Recent Scenarios
-        </Title>
+      <Paper shadow="sm" radius="md" className="overflow-hidden">
+        <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+          <Title order={3} size="h6" className="text-gray-700 font-semibold">
+            Recent Scenarios
+          </Title>
+          <div className="flex items-center">
+            <div className="relative">
+              <IconSearch size={16} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search scenarios..."
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="py-1 pl-8 pr-3 border border-gray-200 rounded-md text-sm w-[200px] focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+        </div>
         
-        <div className="rounded-lg overflow-hidden bg-white border border-gray-200 shadow-sm">
+        <div className="rounded-lg overflow-auto" style={{ maxHeight: '400px' }}>
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-gray-600">
+            <thead className="bg-gray-50 text-left text-gray-600 sticky top-0 z-10">
               <tr>
                 <th className="px-4 py-2.5 font-medium">Scenario info</th>
                 <th className="px-4 py-2.5 font-medium">Browser</th>
@@ -170,18 +192,29 @@ export function DashboardPage() {
                   onClick={() => navigate('/reports')}
                 />
               ))}
+              {filteredScenarios.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="text-center py-8 text-gray-500">
+                    No scenarios found matching your criteria
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-      </div>
+      </Paper>
 
       {/* Create Scenario Modal */}
       <Modal 
         opened={opened} 
         onClose={close}
-        title="Create Scenario from Prompt"
+        title={<Title order={3}>Create Scenario from Prompt</Title>}
         size="lg"
         centered
+        overlayProps={{
+          blur: 3,
+          opacity: 0.55,
+        }}
       >
         <div className="space-y-4">
           <TextInput
@@ -219,11 +252,16 @@ export function DashboardPage() {
             searchable
           />
           
+          <Divider my="sm" />
+          
           <div className="flex justify-end pt-2">
             <Button variant="subtle" onClick={close} className="mr-2">
               Cancel
             </Button>
-            <Button onClick={handleCreateScenario}>
+            <Button 
+              onClick={handleCreateScenario}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               Create Scenario
             </Button>
           </div>
@@ -234,9 +272,13 @@ export function DashboardPage() {
       <Modal
         opened={isCreatingProject}
         onClose={() => setIsCreatingProject(false)}
-        title="Create New Project"
+        title={<Title order={3}>Create New Project</Title>}
         size="md"
         centered
+        overlayProps={{
+          blur: 3,
+          opacity: 0.55,
+        }}
       >
         <div className="space-y-4">
           <TextInput
@@ -252,11 +294,16 @@ export function DashboardPage() {
             placeholder="https://example.com"
           />
           
+          <Divider my="sm" />
+          
           <div className="flex justify-end pt-2">
             <Button variant="subtle" onClick={() => setIsCreatingProject(false)} className="mr-2">
               Cancel
             </Button>
-            <Button onClick={handleCreateProject}>
+            <Button 
+              onClick={handleCreateProject}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               Create Project
             </Button>
           </div>
