@@ -45,9 +45,9 @@ export function Sidebar() {
   return (
     <div className="flex h-full">
       <div className={`${collapsed ? 'w-16' : 'w-64'} h-screen bg-[#f8f9fa] border-r border-gray-200 flex flex-col shadow-sm relative transition-all duration-300 ease-in-out`}>
-        <div className="h-16 flex items-center justify-center border-b border-gray-200">
-          <div className="flex items-center px-4">
-            <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center flex-shrink-0">
+        <div className="h-16 flex items-center justify-between border-b border-gray-200 px-4">
+          <div className="flex items-center">
+            <div className={`w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center flex-shrink-0 ${collapsed ? 'mx-auto' : ''}`}>
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 24 24" 

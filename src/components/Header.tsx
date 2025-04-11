@@ -3,7 +3,7 @@ import { IconChevronDown, IconDots, IconBell, IconHelpCircle } from '@tabler/ico
 
 export function Header() {
   return (
-    <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm">
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm">
       <div className="flex items-center space-x-2">
         <div className="flex items-center">
           <div className="flex items-center px-3 h-8 rounded-l-md bg-white border border-gray-200 border-r-0">
