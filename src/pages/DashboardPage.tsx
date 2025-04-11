@@ -5,7 +5,6 @@ import { IconPlus, IconBrandChrome, IconBrandSafari, IconSearch } from '@tabler/
 import { useNavigate } from 'react-router-dom';
 import { ScenarioStats } from '../components/ScenarioStats';
 import { ScenarioFilters } from '../components/ScenarioFilters';
-import { ScenarioTags } from '../components/ScenarioTags';
 import { ScenarioCard } from '../components/ScenarioCard';
 import { FilterOption, GroupByOption, Scenario, ScenarioGroup } from '../types';
 
@@ -14,7 +13,6 @@ export function DashboardPage() {
   const [filter, setFilter] = useState<FilterOption>('All');
   const [groupBy, setGroupBy] = useState<GroupByOption>('None');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTag, setActiveTag] = useState<string | undefined>(undefined);
   const [opened, { open, close }] = useDisclosure(false);
   const [siteUrl, setSiteUrl] = useState('');
   const [prompt, setPrompt] = useState('');
@@ -28,8 +26,6 @@ export function DashboardPage() {
     { title: 'Active scenarios', count: 12, variant: 'success' },
     { title: 'Failed scenarios', count: 2, variant: 'error' },
   ];
-
-  const tags = ['e-commerce', 'banking', 'social media'];
 
   const scenarios: Scenario[] = [
     {
@@ -72,7 +68,6 @@ export function DashboardPage() {
   const filteredScenarios = scenarios.filter((scenario) => {
     if (filter === 'Failed only' && scenario.status !== 'Failed') return false;
     if (searchQuery && !scenario.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    if (activeTag && !tags.includes(activeTag)) return false;
     return true;
   });
 
@@ -106,10 +101,9 @@ export function DashboardPage() {
       </div>
 
       <Paper shadow="xs" radius="md" p="md" className="mb-6">
-        <div className="flex items-center">
-          <div className="w-64 mr-4">
+        <div className="flex items-center justify-between">
+          <div className="w-64">
             <Select
-              label="Project"
               placeholder="Select project"
               data={['Main-project', 'E-commerce Site', 'Banking Portal']}
               value={selectedProject}
@@ -129,28 +123,7 @@ export function DashboardPage() {
       </Paper>
 
       <div className="mb-6">
-        <div className="grid grid-cols-1 gap-6 mb-4">
-          <ScenarioStats stats={stats} />
-        </div>
-        
-        <div className="mb-4">
-          <Text fw={500} size="sm" className="mb-2">Tags</Text>
-          <ScenarioTags 
-            tags={tags}
-            activeTag={activeTag}
-            onTagSelect={setActiveTag}
-          />
-        </div>
-
-        <Paper shadow="xs" radius="md" p="md">
-          <ScenarioFilters 
-            filterValue={filter}
-            groupByValue={groupBy}
-            onFilterChange={setFilter}
-            onGroupByChange={setGroupBy}
-            onSearchChange={setSearchQuery}
-          />
-        </Paper>
+        <ScenarioStats stats={stats} />
       </div>
 
       <Paper shadow="sm" radius="md" className="overflow-hidden">
@@ -164,14 +137,29 @@ export function DashboardPage() {
               <input
                 type="text"
                 placeholder="Search scenarios..."
+                value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="py-1 pl-8 pr-3 border border-gray-200 rounded-md text-sm w-[200px] focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="ml-4">
+              <Select
+                placeholder="Group by"
+                data={[
+                  { value: 'None', label: 'None' },
+                  { value: 'Flows', label: 'Flows' },
+                  { value: 'By failed step', label: 'By failed step' }
+                ]}
+                value={groupBy}
+                onChange={(value) => value && setGroupBy(value as GroupByOption)}
+                className="w-32"
+                size="xs"
               />
             </div>
           </div>
         </div>
         
-        <div className="rounded-lg overflow-auto" style={{ maxHeight: '400px' }}>
+        <div className="rounded-lg overflow-auto" style={{ maxHeight: '500px' }}>
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-600 sticky top-0 z-10">
               <tr>

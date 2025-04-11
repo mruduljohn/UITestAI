@@ -7,12 +7,11 @@ import {
   IconX, 
   IconExclamationCircle,
   IconPhoto,
-  IconEye
+  IconEye,
+  IconSearch
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { ScenarioStats } from '../components/ScenarioStats';
-import { ScenarioFilters } from '../components/ScenarioFilters';
-import { ScenarioTags } from '../components/ScenarioTags';
 import { ScenarioCard } from '../components/ScenarioCard';
 import { FilterOption, GroupByOption, Scenario, ScenarioGroup } from '../types';
 
@@ -21,7 +20,6 @@ export function ScenarioPage() {
   const [filter, setFilter] = useState<FilterOption>('All');
   const [groupBy, setGroupBy] = useState<GroupByOption>('None');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTag, setActiveTag] = useState<string | undefined>(undefined);
   const [selectedScenario, setSelectedScenario] = useState('Search for a product and add to cart');
   const [selectedStep, setSelectedStep] = useState<number | null>(3);
 
@@ -31,8 +29,6 @@ export function ScenarioPage() {
     { title: 'Passed steps', count: 9, variant: 'success' },
     { title: 'Failed steps', count: 1, variant: 'error' },
   ];
-
-  const tags = ['regression', 'login', 'user management'];
 
   const scenarios: Scenario[] = [
     {
@@ -75,7 +71,6 @@ export function ScenarioPage() {
   const filteredScenarios = scenarios.filter((scenario) => {
     if (filter === 'Failed only' && scenario.status !== 'Failed') return false;
     if (searchQuery && !scenario.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    if (activeTag && !tags.includes(activeTag)) return false;
     return true;
   });
 
@@ -252,10 +247,36 @@ export function ScenarioPage() {
       </div>
 
       <Paper shadow="sm" radius="md" className="overflow-hidden mb-6">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
           <Title order={3} size="h6" className="text-gray-700 font-semibold">
             Related Scenarios
           </Title>
+          <div className="flex items-center">
+            <div className="relative">
+              <IconSearch size={16} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search scenarios..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="py-1 pl-8 pr-3 border border-gray-200 rounded-md text-sm w-[200px] focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="ml-4">
+              <Select
+                placeholder="Group by"
+                data={[
+                  { value: 'None', label: 'None' },
+                  { value: 'Flows', label: 'Flows' },
+                  { value: 'By failed step', label: 'By failed step' }
+                ]}
+                value={groupBy}
+                onChange={(value) => value && setGroupBy(value as GroupByOption)}
+                className="w-32"
+                size="xs"
+              />
+            </div>
+          </div>
         </div>
         
         <div className="rounded-lg overflow-auto" style={{ maxHeight: '300px' }}>
